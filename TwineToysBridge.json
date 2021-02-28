@@ -1,0 +1,2088 @@
+{
+    "initialActions": [],
+    "finalActions": [],
+    "globalTriggers": [
+        {
+            "type": "componentState",
+            "action": "pulse",
+            "actions": [
+                {
+                    "job": "Primary",
+                    "type": "updateVariable",
+                    "value": "{trigger-toy}",
+                    "variable": "toy"
+                },
+                {
+                    "type": "updateVariable",
+                    "value": "{trigger-intensity}",
+                    "variable": "intensity"
+                },
+                {
+                    "type": "updateVariable",
+                    "value": "{trigger-duration}",
+                    "variable": "duration"
+                },
+                {
+                    "job": "Primary",
+                    "type": "updateJob",
+                    "action": "start"
+                }
+            ],
+            "channel": "webhook-a",
+            "expression": "test"
+        },
+        {
+            "type": "componentState",
+            "action": "shock",
+            "actions": [
+                {
+                    "type": "updateVariable",
+                    "value": "{trigger-intensity}",
+                    "variable": "intensity"
+                },
+                {
+                    "type": "updateVariable",
+                    "value": "{trigger-vibrate}",
+                    "variable": "vibrate"
+                },
+                {
+                    "job": "Shock",
+                    "type": "updateJob",
+                    "action": "start"
+                }
+            ],
+            "channel": "webhook-a"
+        },
+        {
+            "type": "componentState",
+            "action": "vibrate",
+            "actions": [
+                {
+                    "type": "updateVariable",
+                    "value": "{trigger-toy}",
+                    "variable": "toy"
+                },
+                {
+                    "type": "updateVariable",
+                    "value": "{trigger-intensity}",
+                    "variable": "intensity"
+                },
+                {
+                    "type": "updateVariable",
+                    "value": "{trigger-pattern}",
+                    "variable": "pattern"
+                },
+                {
+                    "job": "Vibrate",
+                    "type": "updateJob",
+                    "action": "start"
+                }
+            ],
+            "channel": "webhook-a"
+        },
+        {
+            "type": "componentState",
+            "action": "stop",
+            "actions": [
+                {
+                    "type": "updateVariable",
+                    "value": "{trigger-toy}",
+                    "variable": "toy"
+                },
+                {
+                    "type": "updateVariable",
+                    "value": "0",
+                    "variable": "intensity"
+                },
+                {
+                    "type": "updateVariable",
+                    "value": "stop",
+                    "variable": "pattern"
+                },
+                {
+                    "job": "Vibrate",
+                    "type": "updateJob",
+                    "action": "start"
+                }
+            ],
+            "channel": "webhook-a"
+        }
+    ],
+    "jobs": {
+        "Shock": {
+            "steps": {
+                "START": {
+                    "triggers": [
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setVibrate",
+                                    "channel": "shockcollar-a"
+                                }
+                            ],
+                            "expression": "{vibrate} == \"true\""
+                        },
+                        {
+                            "type": "timer",
+                            "amount": "0",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setVolume",
+                                    "volume": "{intensity} * {shock_max} / 15",
+                                    "channel": "shockcollar-a",
+                                    "alsoShock": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "timer",
+                            "amount": "1",
+                            "actions": [
+                                {
+                                    "job": "Shock",
+                                    "type": "updateJob",
+                                    "action": "stop"
+                                }
+                            ],
+                            "expression": "1"
+                        }
+                    ]
+                }
+            }
+        },
+        "Primary": {
+            "steps": {
+                "STOP": {
+                    "triggers": [
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setVolume",
+                                    "channel": "generic-1-a",
+                                    "percentVolume": "0"
+                                },
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-a",
+                                    "pattern": {
+                                        "name": "Off",
+                                        "channels": 1,
+                                        "description": "Intensity will be at 0 even if slider is active",
+                                        "patternData": {
+                                            "waves": 1,
+                                            "channels": 1,
+                                            "initialActions": [
+                                                {
+                                                    "part": "volume",
+                                                    "type": "updatePattern",
+                                                    "wave": 1,
+                                                    "volume": 0,
+                                                    "channel": 1
+                                                }
+                                            ]
+                                        },
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{toy} == \"primary\""
+                        },
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setVolume",
+                                    "channel": "generic-1-b",
+                                    "percentVolume": "0"
+                                },
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-b",
+                                    "pattern": {
+                                        "name": "Off",
+                                        "channels": 1,
+                                        "description": "Intensity will be at 0 even if slider is active",
+                                        "patternData": {
+                                            "waves": 1,
+                                            "channels": 1,
+                                            "initialActions": [
+                                                {
+                                                    "part": "volume",
+                                                    "type": "updatePattern",
+                                                    "wave": 1,
+                                                    "volume": 0,
+                                                    "channel": 1
+                                                }
+                                            ]
+                                        },
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{toy} == \"secondary\""
+                        },
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setVolume",
+                                    "channel": "generic-1-a",
+                                    "percentVolume": "0"
+                                },
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setVolume",
+                                    "channel": "generic-1-b",
+                                    "percentVolume": "0"
+                                },
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-a",
+                                    "pattern": {
+                                        "name": "Off",
+                                        "channels": 1,
+                                        "description": "Intensity will be at 0 even if slider is active",
+                                        "patternData": {
+                                            "waves": 1,
+                                            "channels": 1,
+                                            "initialActions": [
+                                                {
+                                                    "part": "volume",
+                                                    "type": "updatePattern",
+                                                    "wave": 1,
+                                                    "volume": 0,
+                                                    "channel": 1
+                                                }
+                                            ]
+                                        },
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                },
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-b",
+                                    "pattern": {
+                                        "name": "Off",
+                                        "channels": 1,
+                                        "description": "Intensity will be at 0 even if slider is active",
+                                        "patternData": {
+                                            "waves": 1,
+                                            "channels": 1,
+                                            "initialActions": [
+                                                {
+                                                    "part": "volume",
+                                                    "type": "updatePattern",
+                                                    "wave": 1,
+                                                    "volume": 0,
+                                                    "channel": 1
+                                                }
+                                            ]
+                                        },
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{toy} == \"both\""
+                        },
+                        {
+                            "type": "timer",
+                            "amount": "0",
+                            "actions": [
+                                {
+                                    "job": "Primary",
+                                    "type": "updateJob",
+                                    "action": "stop"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "START": {
+                    "actions": [],
+                    "triggers": [
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setVolume",
+                                    "channel": "generic-1-a",
+                                    "percentVolume": "{intensity} * {primary_max} / 100"
+                                },
+                                {
+                                    "job": "Primary",
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-a",
+                                    "pattern": {
+                                        "name": "On",
+                                        "channels": 1,
+                                        "description": "Intensity will match slider",
+                                        "patternData": {
+                                            "waves": 1,
+                                            "channels": 1,
+                                            "initialActions": [
+                                                {
+                                                    "part": "volume",
+                                                    "type": "updatePattern",
+                                                    "wave": 1,
+                                                    "volume": 100,
+                                                    "channel": 1
+                                                }
+                                            ]
+                                        },
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{toy} == \"primary\""
+                        },
+                        {
+                            "type": "timer",
+                            "amount": "{duration}",
+                            "actions": [
+                                {
+                                    "job": "Primary",
+                                    "step": "STOP",
+                                    "type": "updateJob",
+                                    "action": "goTo"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setVolume",
+                                    "channel": "generic-1-b",
+                                    "percentVolume": "{intensity} * {secondary_max} / 100"
+                                },
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-b",
+                                    "pattern": {
+                                        "name": "On",
+                                        "channels": 1,
+                                        "description": "Intensity will match slider",
+                                        "patternData": {
+                                            "waves": 1,
+                                            "channels": 1,
+                                            "initialActions": [
+                                                {
+                                                    "part": "volume",
+                                                    "type": "updatePattern",
+                                                    "wave": 1,
+                                                    "volume": 100,
+                                                    "channel": 1
+                                                }
+                                            ]
+                                        },
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{toy} == \"secondary\""
+                        },
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setVolume",
+                                    "channel": "generic-1-a",
+                                    "percentVolume": "{intensity} * {primary_max} / 100"
+                                },
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setVolume",
+                                    "channel": "generic-1-b",
+                                    "percentVolume": "{intensity} * {primary_max} / 100"
+                                },
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-a",
+                                    "pattern": {
+                                        "name": "On",
+                                        "channels": 1,
+                                        "description": "Intensity will match slider",
+                                        "patternData": {
+                                            "waves": 1,
+                                            "channels": 1,
+                                            "initialActions": [
+                                                {
+                                                    "part": "volume",
+                                                    "type": "updatePattern",
+                                                    "wave": 1,
+                                                    "volume": 100,
+                                                    "channel": 1
+                                                }
+                                            ]
+                                        },
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                },
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-b",
+                                    "pattern": {
+                                        "name": "On",
+                                        "channels": 1,
+                                        "description": "Intensity will match slider",
+                                        "patternData": {
+                                            "waves": 1,
+                                            "channels": 1,
+                                            "initialActions": [
+                                                {
+                                                    "part": "volume",
+                                                    "type": "updatePattern",
+                                                    "wave": 1,
+                                                    "volume": 100,
+                                                    "channel": 1
+                                                }
+                                            ]
+                                        },
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{toy} == \"both\""
+                        }
+                    ]
+                }
+            }
+        },
+        "Vibrate": {
+            "steps": {
+                "START": {
+                    "triggers": [
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setVolume",
+                                    "channel": "generic-1-a",
+                                    "percentVolume": "{intensity} * {primary_max} / 100"
+                                },
+                                {
+                                    "job": "Vibrate",
+                                    "step": "PrimaryPattern",
+                                    "type": "updateJob",
+                                    "action": "goTo"
+                                }
+                            ],
+                            "expression": "{toy} == \"primary\""
+                        },
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setVolume",
+                                    "channel": "generic-1-a",
+                                    "percentVolume": "{intensity} * {secondary_max} / 100"
+                                },
+                                {
+                                    "job": "Vibrate",
+                                    "step": "SecondaryPattern",
+                                    "type": "updateJob",
+                                    "action": "goTo"
+                                }
+                            ],
+                            "expression": "{toy} == \"secondary\""
+                        },
+                        {
+                            "type": "expressionState",
+                            "amount": "",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setVolume",
+                                    "channel": "generic-1-a",
+                                    "percentVolume": "{intensity} * {primary_max} / 100"
+                                },
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setVolume",
+                                    "channel": "generic-1-b",
+                                    "percentVolume": "{intensity} * {secondary_max} / 100"
+                                },
+                                {
+                                    "job": "Vibrate",
+                                    "step": "PrimaryPattern",
+                                    "type": "updateJob",
+                                    "action": "goTo"
+                                },
+                                {
+                                    "job": "Vibrate",
+                                    "step": "SecondaryPattern",
+                                    "type": "updateJob",
+                                    "action": "goTo"
+                                }
+                            ],
+                            "expression": "{toy} == \"both\""
+                        }
+                    ]
+                },
+                "PrimaryPattern": {
+                    "triggers": [
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-a",
+                                    "pattern": {
+                                        "name": "On",
+                                        "channels": 1,
+                                        "description": "Intensity will match slider",
+                                        "patternData": {
+                                            "waves": 1,
+                                            "channels": 1,
+                                            "initialActions": [
+                                                {
+                                                    "part": "volume",
+                                                    "type": "updatePattern",
+                                                    "wave": 1,
+                                                    "volume": 100,
+                                                    "channel": 1
+                                                }
+                                            ]
+                                        },
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{pattern} == \"steady\""
+                        },
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-a",
+                                    "pattern": {
+                                        "id": "-MUPmvYirIhZ2m52uYam",
+                                        "name": "Waves",
+                                        "tags": [],
+                                        "type": "script",
+                                        "channels": 1,
+                                        "published": null,
+                                        "description": "Simple steady waves.\nIncludes a slider to adjust the wave speed.",
+                                        "patternData": {
+                                            "ma": {
+                                                "speed": {
+                                                    "max": 5,
+                                                    "min": 0.2,
+                                                    "name": "Speed",
+                                                    "step": 0.2,
+                                                    "type": "slider",
+                                                    "value": 2,
+                                                    "description": "Adjust the speed of each wave"
+                                                }
+                                            },
+                                            "jobs": {
+                                                "1": {
+                                                    "steps": {
+                                                        "START": {
+                                                            "actions": [
+                                                                {
+                                                                    "max": "100",
+                                                                    "min": "0",
+                                                                    "part": "pulse",
+                                                                    "type": "updatePattern",
+                                                                    "wave": 1,
+                                                                    "speed": "{speed}",
+                                                                    "timer": "0.01",
+                                                                    "action": "enable",
+                                                                    "active": true,
+                                                                    "channel": 1,
+                                                                    "initial": "0",
+                                                                    "function": "Smooth",
+                                                                    "directions": "updown"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "waves": "1",
+                                            "channels": 1,
+                                            "waveCombine": "average",
+                                            "initialActions": [
+                                                {
+                                                    "job": "1",
+                                                    "type": "updateJob",
+                                                    "action": "start"
+                                                }
+                                            ]
+                                        },
+                                        "parentUpdate": null,
+                                        "publishedLatest": null,
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{pattern} == \"waves\""
+                        },
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-a",
+                                    "pattern": {
+                                        "id": "-MUPmunrBuZCtPDXmSg-",
+                                        "name": "Toggle",
+                                        "tags": [],
+                                        "type": "script",
+                                        "channels": 1,
+                                        "published": null,
+                                        "description": "On and off every second.\nIncludes a slider to adjust the toggle speed.",
+                                        "patternData": {
+                                            "ma": {
+                                                "speed": {
+                                                    "max": 4,
+                                                    "min": 1,
+                                                    "name": "Speed",
+                                                    "step": 0.2,
+                                                    "type": "slider",
+                                                    "value": 2,
+                                                    "description": "Speed of toggling on and off"
+                                                }
+                                            },
+                                            "jobs": {
+                                                "1": {
+                                                    "steps": {
+                                                        "START": {
+                                                            "actions": [
+                                                                {
+                                                                    "max": "100",
+                                                                    "min": "0",
+                                                                    "part": "pulse",
+                                                                    "type": "updatePattern",
+                                                                    "wave": 1,
+                                                                    "speed": "{speed}",
+                                                                    "timer": "0.02",
+                                                                    "active": true,
+                                                                    "channel": 1,
+                                                                    "initial": "50",
+                                                                    "function": "Square",
+                                                                    "directions": "updown"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "waves": "1",
+                                            "channels": 1,
+                                            "waveCombine": "average",
+                                            "initialActions": [
+                                                {
+                                                    "job": "1",
+                                                    "type": "updateJob",
+                                                    "action": "start"
+                                                }
+                                            ]
+                                        },
+                                        "parentUpdate": null,
+                                        "publishedLatest": null,
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{pattern} == \"toggle\""
+                        },
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-a",
+                                    "pattern": {
+                                        "id": "-MUPmidTKypmOAKNQ_3W",
+                                        "name": "Slow Increase + Hold at Max",
+                                        "tags": [],
+                                        "type": "script",
+                                        "channels": 1,
+                                        "published": null,
+                                        "description": "Slow increase to max intensity and then hold for a given number of seconds.\nIncludes controls for how quickly to ramp up and how long to hold at max intensity.",
+                                        "patternData": {
+                                            "ma": {
+                                                "ramp-speed": {
+                                                    "max": 20,
+                                                    "min": 1,
+                                                    "name": "Ramp Speed",
+                                                    "step": 1,
+                                                    "type": "slider",
+                                                    "value": 5
+                                                },
+                                                "max-seconds": {
+                                                    "max": 120,
+                                                    "min": 5,
+                                                    "name": "Seconds to Stay at Max",
+                                                    "step": 5,
+                                                    "type": "slider",
+                                                    "value": 30
+                                                }
+                                            },
+                                            "jobs": {
+                                                "1": {
+                                                    "steps": {
+                                                        "START": {
+                                                            "actions": [
+                                                                {
+                                                                    "job": "1",
+                                                                    "max": "100",
+                                                                    "min": "0",
+                                                                    "part": "pulse",
+                                                                    "type": "updatePattern",
+                                                                    "wave": 1,
+                                                                    "speed": "{ramp-speed}",
+                                                                    "timer": "1",
+                                                                    "active": true,
+                                                                    "channel": 1,
+                                                                    "initial": "0",
+                                                                    "directions": "up"
+                                                                }
+                                                            ],
+                                                            "triggers": [
+                                                                {
+                                                                    "part": "volume",
+                                                                    "type": "patternState",
+                                                                    "wave": 1,
+                                                                    "value": "100",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "Stay at Max",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        }
+                                                                    ],
+                                                                    "channel": 1,
+                                                                    "operator": ">="
+                                                                }
+                                                            ]
+                                                        },
+                                                        "Stay at Max": {
+                                                            "actions": [],
+                                                            "triggers": [
+                                                                {
+                                                                    "type": "timer",
+                                                                    "amount": "{max-seconds}",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "START",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "2": {
+                                                    "steps": {}
+                                                }
+                                            },
+                                            "waves": 1,
+                                            "channels": 1,
+                                            "waveCombine": "average",
+                                            "initialActions": [
+                                                {
+                                                    "job": 1,
+                                                    "type": "updateJob",
+                                                    "action": "start"
+                                                }
+                                            ]
+                                        },
+                                        "parentUpdate": null,
+                                        "publishedLatest": null,
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{pattern} == \"slow_increase_hold_at_max\""
+                        },
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-a",
+                                    "pattern": {
+                                        "id": "-MUPmbRKC1z0vbrN1Hzs",
+                                        "name": "Random Torment",
+                                        "tags": [],
+                                        "type": "script",
+                                        "channels": 1,
+                                        "published": null,
+                                        "description": "Ramp to 100% after a random amount of time for a random amount of time.\nIncludes controls for adjusting the time until the next ramp up, the ramp up speed, and how long to hold at max speed.",
+                                        "patternData": {
+                                            "ma": {
+                                                "hold-time": {
+                                                    "name": "Hold Time",
+                                                    "type": "input",
+                                                    "value": "0|0|5|5|10|60",
+                                                    "description": "How many seconds to stay at max intensity (random value from | separated list)"
+                                                },
+                                                "ramp-time": {
+                                                    "name": "Ramp Time",
+                                                    "type": "input",
+                                                    "value": "1-5",
+                                                    "description": "How fast to ramp up to max intensity (percent increase per 0.1 seconds)"
+                                                },
+                                                "random-start": {
+                                                    "name": "Random Start",
+                                                    "type": "input",
+                                                    "value": "5|10|20|30|60",
+                                                    "description": "How many seconds to wait until starting the next ramp up (random value from | separated list)"
+                                                }
+                                            },
+                                            "jobs": {
+                                                "1": {
+                                                    "steps": {
+                                                        "STOP": {
+                                                            "actions": [
+                                                                {
+                                                                    "part": "pulse",
+                                                                    "type": "updatePattern",
+                                                                    "wave": 1,
+                                                                    "active": false,
+                                                                    "channel": 1
+                                                                },
+                                                                {
+                                                                    "part": "volume",
+                                                                    "type": "updatePattern",
+                                                                    "wave": 1,
+                                                                    "volume": "0",
+                                                                    "channel": 1
+                                                                },
+                                                                {
+                                                                    "job": "1",
+                                                                    "step": "START",
+                                                                    "type": "updateJob",
+                                                                    "action": "goTo"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "START": {
+                                                            "actions": [],
+                                                            "triggers": [
+                                                                {
+                                                                    "type": "timer",
+                                                                    "amount": "({random-start})",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "Random-(1-1)",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        "Random-1": {
+                                                            "actions": [
+                                                                {
+                                                                    "max": "100",
+                                                                    "part": "pulse",
+                                                                    "type": "updatePattern",
+                                                                    "wave": 1,
+                                                                    "speed": "({ramp-time})",
+                                                                    "timer": "0.1",
+                                                                    "active": true,
+                                                                    "channel": 1,
+                                                                    "initial": "0",
+                                                                    "directions": "up"
+                                                                }
+                                                            ],
+                                                            "triggers": [
+                                                                {
+                                                                    "part": "volume",
+                                                                    "type": "patternState",
+                                                                    "wave": 1,
+                                                                    "value": "100",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "Random-1-Hold",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        }
+                                                                    ],
+                                                                    "channel": 1,
+                                                                    "operator": ">="
+                                                                }
+                                                            ]
+                                                        },
+                                                        "Random-1-Hold": {
+                                                            "triggers": [
+                                                                {
+                                                                    "type": "timer",
+                                                                    "amount": "({hold-time})",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "STOP",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "waves": 1,
+                                            "channels": 1,
+                                            "waveCombine": "average",
+                                            "initialActions": [
+                                                {
+                                                    "job": 1,
+                                                    "type": "updateJob",
+                                                    "action": "start"
+                                                }
+                                            ]
+                                        },
+                                        "parentUpdate": null,
+                                        "publishedLatest": null,
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{pattern} == \"random_torment\""
+                        },
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-a",
+                                    "pattern": {
+                                        "id": "-MUPjkSW7SOf2G1I6y4t",
+                                        "name": "Increase Then Reverse",
+                                        "tags": [],
+                                        "type": "script",
+                                        "channels": 1,
+                                        "published": null,
+                                        "description": "Ramp up for 2 seconds and then ramp down for 2 seconds.",
+                                        "patternData": {
+                                            "ma": {},
+                                            "jobs": {
+                                                "1": {
+                                                    "steps": {
+                                                        "Up": {
+                                                            "actions": [],
+                                                            "triggers": [
+                                                                {
+                                                                    "type": "timer",
+                                                                    "amount": "0.2",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "Up",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        },
+                                                                        {
+                                                                            "part": "volume",
+                                                                            "type": "updatePattern",
+                                                                            "wave": 1,
+                                                                            "volume": "+10",
+                                                                            "channel": 1
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "part": "volume",
+                                                                    "type": "patternState",
+                                                                    "wave": 1,
+                                                                    "value": "100",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "Down",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        }
+                                                                    ],
+                                                                    "channel": 1,
+                                                                    "operator": ">="
+                                                                }
+                                                            ]
+                                                        },
+                                                        "Down": {
+                                                            "actions": [],
+                                                            "triggers": [
+                                                                {
+                                                                    "type": "timer",
+                                                                    "amount": "0.2",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "Down",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        },
+                                                                        {
+                                                                            "part": "volume",
+                                                                            "type": "updatePattern",
+                                                                            "wave": 1,
+                                                                            "volume": "-10",
+                                                                            "channel": 1
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "part": "volume",
+                                                                    "type": "patternState",
+                                                                    "wave": 1,
+                                                                    "value": "0",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "Up",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        }
+                                                                    ],
+                                                                    "channel": 1,
+                                                                    "operator": "<="
+                                                                }
+                                                            ]
+                                                        },
+                                                        "START": {
+                                                            "actions": [
+                                                                {
+                                                                    "job": "1",
+                                                                    "step": "Up",
+                                                                    "type": "updateJob",
+                                                                    "action": "goTo"
+                                                                },
+                                                                {
+                                                                    "part": "volume",
+                                                                    "type": "updatePattern",
+                                                                    "wave": 1,
+                                                                    "volume": "0",
+                                                                    "channel": 1
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "waves": "1",
+                                            "channels": 1,
+                                            "waveCombine": "average",
+                                            "initialActions": [
+                                                {
+                                                    "job": "1",
+                                                    "type": "updateJob",
+                                                    "action": "start"
+                                                }
+                                            ]
+                                        },
+                                        "parentUpdate": null,
+                                        "publishedLatest": null,
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{pattern} == \"increase_then_reverse\""
+                        },
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-a",
+                                    "pattern": {
+                                        "id": "-MUPmaXoGv7Zz2Qc5WDs",
+                                        "name": "Increase Then Drop",
+                                        "tags": [],
+                                        "type": "script",
+                                        "channels": 1,
+                                        "published": null,
+                                        "description": "Ramp up for 2 seconds and then drop to 0.",
+                                        "patternData": {
+                                            "ma": {},
+                                            "jobs": {
+                                                "1": {
+                                                    "steps": {
+                                                        "1": {
+                                                            "actions": [],
+                                                            "triggers": [
+                                                                {
+                                                                    "type": "timer",
+                                                                    "amount": "0.2",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "1",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        },
+                                                                        {
+                                                                            "part": "volume",
+                                                                            "type": "updatePattern",
+                                                                            "wave": 1,
+                                                                            "volume": "+10",
+                                                                            "channel": 1
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "part": "volume",
+                                                                    "type": "patternState",
+                                                                    "wave": 1,
+                                                                    "value": "100",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "START",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        }
+                                                                    ],
+                                                                    "channel": 1,
+                                                                    "operator": ">="
+                                                                }
+                                                            ]
+                                                        },
+                                                        "START": {
+                                                            "actions": [
+                                                                {
+                                                                    "job": "1",
+                                                                    "step": "1",
+                                                                    "type": "updateJob",
+                                                                    "action": "goTo"
+                                                                },
+                                                                {
+                                                                    "part": "volume",
+                                                                    "type": "updatePattern",
+                                                                    "wave": 1,
+                                                                    "volume": "0",
+                                                                    "channel": 1
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "waves": "1",
+                                            "channels": 1,
+                                            "waveCombine": "average",
+                                            "initialActions": [
+                                                {
+                                                    "job": "1",
+                                                    "type": "updateJob",
+                                                    "action": "start"
+                                                }
+                                            ]
+                                        },
+                                        "parentUpdate": null,
+                                        "publishedLatest": null,
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{pattern} == \"increase_then_drop\""
+                        },
+                        {
+                            "type": "timer",
+                            "amount": "1",
+                            "actions": [
+                                {
+                                    "job": "Vibrate",
+                                    "type": "updateJob",
+                                    "action": "stop"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-a",
+                                    "pattern": {
+                                        "name": "Off",
+                                        "channels": 1,
+                                        "description": "Intensity will be at 0 even if slider is active",
+                                        "patternData": {
+                                            "waves": 1,
+                                            "channels": 1,
+                                            "initialActions": [
+                                                {
+                                                    "part": "volume",
+                                                    "type": "updatePattern",
+                                                    "wave": 1,
+                                                    "volume": 0,
+                                                    "channel": 1
+                                                }
+                                            ]
+                                        },
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{pattern} == \"stop\""
+                        }
+                    ]
+                },
+                "SecondaryPattern": {
+                    "triggers": [
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-b",
+                                    "pattern": {
+                                        "name": "On",
+                                        "channels": 1,
+                                        "description": "Intensity will match slider",
+                                        "patternData": {
+                                            "custom": "on"
+                                        },
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{pattern} == \"steady\""
+                        },
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-b",
+                                    "pattern": {
+                                        "id": "-MUPmvYirIhZ2m52uYam",
+                                        "name": "Waves",
+                                        "tags": [],
+                                        "type": "script",
+                                        "channels": 1,
+                                        "published": null,
+                                        "description": "Simple steady waves.\nIncludes a slider to adjust the wave speed.",
+                                        "patternData": {
+                                            "ma": {
+                                                "speed": {
+                                                    "max": 5,
+                                                    "min": 0.2,
+                                                    "name": "Speed",
+                                                    "step": 0.2,
+                                                    "type": "slider",
+                                                    "value": 2,
+                                                    "description": "Adjust the speed of each wave"
+                                                }
+                                            },
+                                            "jobs": {
+                                                "1": {
+                                                    "steps": {
+                                                        "START": {
+                                                            "actions": [
+                                                                {
+                                                                    "max": "100",
+                                                                    "min": "0",
+                                                                    "part": "pulse",
+                                                                    "type": "updatePattern",
+                                                                    "wave": 1,
+                                                                    "speed": "{speed}",
+                                                                    "timer": "0.01",
+                                                                    "action": "enable",
+                                                                    "active": true,
+                                                                    "channel": 1,
+                                                                    "initial": "0",
+                                                                    "function": "Smooth",
+                                                                    "directions": "updown"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "waves": "1",
+                                            "channels": 1,
+                                            "waveCombine": "average",
+                                            "initialActions": [
+                                                {
+                                                    "job": "1",
+                                                    "type": "updateJob",
+                                                    "action": "start"
+                                                }
+                                            ]
+                                        },
+                                        "parentUpdate": null,
+                                        "publishedLatest": null,
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{pattern} == \"waves\""
+                        },
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-b",
+                                    "pattern": {
+                                        "id": "-MUPmunrBuZCtPDXmSg-",
+                                        "name": "Toggle",
+                                        "tags": [],
+                                        "type": "script",
+                                        "channels": 1,
+                                        "published": null,
+                                        "description": "On and off every second.\nIncludes a slider to adjust the toggle speed.",
+                                        "patternData": {
+                                            "ma": {
+                                                "speed": {
+                                                    "max": 4,
+                                                    "min": 1,
+                                                    "name": "Speed",
+                                                    "step": 0.2,
+                                                    "type": "slider",
+                                                    "value": 2,
+                                                    "description": "Speed of toggling on and off"
+                                                }
+                                            },
+                                            "jobs": {
+                                                "1": {
+                                                    "steps": {
+                                                        "START": {
+                                                            "actions": [
+                                                                {
+                                                                    "max": "100",
+                                                                    "min": "0",
+                                                                    "part": "pulse",
+                                                                    "type": "updatePattern",
+                                                                    "wave": 1,
+                                                                    "speed": "{speed}",
+                                                                    "timer": "0.02",
+                                                                    "active": true,
+                                                                    "channel": 1,
+                                                                    "initial": "50",
+                                                                    "function": "Square",
+                                                                    "directions": "updown"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "waves": "1",
+                                            "channels": 1,
+                                            "waveCombine": "average",
+                                            "initialActions": [
+                                                {
+                                                    "job": "1",
+                                                    "type": "updateJob",
+                                                    "action": "start"
+                                                }
+                                            ]
+                                        },
+                                        "parentUpdate": null,
+                                        "publishedLatest": null,
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{pattern} == \"toggle\""
+                        },
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-b",
+                                    "pattern": {
+                                        "id": "-MUPmidTKypmOAKNQ_3W",
+                                        "name": "Slow Increase + Hold at Max",
+                                        "tags": [],
+                                        "type": "script",
+                                        "channels": 1,
+                                        "published": null,
+                                        "description": "Slow increase to max intensity and then hold for a given number of seconds.\nIncludes controls for how quickly to ramp up and how long to hold at max intensity.",
+                                        "patternData": {
+                                            "ma": {
+                                                "ramp-speed": {
+                                                    "max": 20,
+                                                    "min": 1,
+                                                    "name": "Ramp Speed",
+                                                    "step": 1,
+                                                    "type": "slider",
+                                                    "value": 5
+                                                },
+                                                "max-seconds": {
+                                                    "max": 120,
+                                                    "min": 5,
+                                                    "name": "Seconds to Stay at Max",
+                                                    "step": 5,
+                                                    "type": "slider",
+                                                    "value": 30
+                                                }
+                                            },
+                                            "jobs": {
+                                                "1": {
+                                                    "steps": {
+                                                        "START": {
+                                                            "actions": [
+                                                                {
+                                                                    "job": "1",
+                                                                    "max": "100",
+                                                                    "min": "0",
+                                                                    "part": "pulse",
+                                                                    "type": "updatePattern",
+                                                                    "wave": 1,
+                                                                    "speed": "{ramp-speed}",
+                                                                    "timer": "1",
+                                                                    "active": true,
+                                                                    "channel": 1,
+                                                                    "initial": "0",
+                                                                    "directions": "up"
+                                                                }
+                                                            ],
+                                                            "triggers": [
+                                                                {
+                                                                    "part": "volume",
+                                                                    "type": "patternState",
+                                                                    "wave": 1,
+                                                                    "value": "100",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "Stay at Max",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        }
+                                                                    ],
+                                                                    "channel": 1,
+                                                                    "operator": ">="
+                                                                }
+                                                            ]
+                                                        },
+                                                        "Stay at Max": {
+                                                            "actions": [],
+                                                            "triggers": [
+                                                                {
+                                                                    "type": "timer",
+                                                                    "amount": "{max-seconds}",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "START",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "2": {
+                                                    "steps": {}
+                                                }
+                                            },
+                                            "waves": 1,
+                                            "channels": 1,
+                                            "waveCombine": "average",
+                                            "initialActions": [
+                                                {
+                                                    "job": 1,
+                                                    "type": "updateJob",
+                                                    "action": "start"
+                                                }
+                                            ]
+                                        },
+                                        "parentUpdate": null,
+                                        "publishedLatest": null,
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{pattern} == \"slow_inscrease_hold_at_max\""
+                        },
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-b",
+                                    "pattern": {
+                                        "id": "-MUIuUv3FwEF1rINzYwC",
+                                        "name": "Random Torment",
+                                        "tags": [],
+                                        "type": "script",
+                                        "channels": 1,
+                                        "published": null,
+                                        "description": "Ramp to 100% after a random amount of time for a random amount of time.\nIncludes controls for adjusting the time until the next ramp up, the ramp up speed, and how long to hold at max speed.",
+                                        "patternData": {
+                                            "ma": {
+                                                "hold-time": {
+                                                    "name": "Hold Time",
+                                                    "type": "input",
+                                                    "value": "0|0|5|5|10|60",
+                                                    "description": "How many seconds to stay at max intensity (random value from | separated list)"
+                                                },
+                                                "ramp-time": {
+                                                    "name": "Ramp Time",
+                                                    "type": "input",
+                                                    "value": "1-5",
+                                                    "description": "How fast to ramp up to max intensity (percent increase per 0.1 seconds)"
+                                                },
+                                                "random-start": {
+                                                    "name": "Random Start",
+                                                    "type": "input",
+                                                    "value": "5|10|20|30|60",
+                                                    "description": "How many seconds to wait until starting the next ramp up (random value from | separated list)"
+                                                }
+                                            },
+                                            "jobs": {
+                                                "1": {
+                                                    "steps": {
+                                                        "STOP": {
+                                                            "actions": [
+                                                                {
+                                                                    "part": "pulse",
+                                                                    "type": "updatePattern",
+                                                                    "wave": 1,
+                                                                    "active": false,
+                                                                    "channel": 1
+                                                                },
+                                                                {
+                                                                    "part": "volume",
+                                                                    "type": "updatePattern",
+                                                                    "wave": 1,
+                                                                    "volume": "0",
+                                                                    "channel": 1
+                                                                },
+                                                                {
+                                                                    "job": "1",
+                                                                    "step": "START",
+                                                                    "type": "updateJob",
+                                                                    "action": "goTo"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "START": {
+                                                            "actions": [],
+                                                            "triggers": [
+                                                                {
+                                                                    "type": "timer",
+                                                                    "amount": "({random-start})",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "Random-(1-1)",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        "Random-1": {
+                                                            "actions": [
+                                                                {
+                                                                    "max": "100",
+                                                                    "part": "pulse",
+                                                                    "type": "updatePattern",
+                                                                    "wave": 1,
+                                                                    "speed": "({ramp-time})",
+                                                                    "timer": "0.1",
+                                                                    "active": true,
+                                                                    "channel": 1,
+                                                                    "initial": "0",
+                                                                    "directions": "up"
+                                                                }
+                                                            ],
+                                                            "triggers": [
+                                                                {
+                                                                    "part": "volume",
+                                                                    "type": "patternState",
+                                                                    "wave": 1,
+                                                                    "value": "100",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "Random-1-Hold",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        }
+                                                                    ],
+                                                                    "channel": 1,
+                                                                    "operator": ">="
+                                                                }
+                                                            ]
+                                                        },
+                                                        "Random-1-Hold": {
+                                                            "triggers": [
+                                                                {
+                                                                    "type": "timer",
+                                                                    "amount": "({hold-time})",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "STOP",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "waves": 1,
+                                            "channels": 1,
+                                            "waveCombine": "average",
+                                            "initialActions": [
+                                                {
+                                                    "job": 1,
+                                                    "type": "updateJob",
+                                                    "action": "start"
+                                                }
+                                            ]
+                                        },
+                                        "parentUpdate": null,
+                                        "publishedLatest": null,
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{pattern} == \"random_torment\""
+                        },
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-b",
+                                    "pattern": {
+                                        "id": "-MUPmxA1RD2xbxAuWNbu",
+                                        "name": "Increase Then Reverse",
+                                        "tags": [],
+                                        "type": "script",
+                                        "channels": 1,
+                                        "published": null,
+                                        "description": "Ramp up for 2 seconds and then ramp down for 2 seconds.",
+                                        "patternData": {
+                                            "ma": {},
+                                            "jobs": {
+                                                "1": {
+                                                    "steps": {
+                                                        "Up": {
+                                                            "actions": [],
+                                                            "triggers": [
+                                                                {
+                                                                    "type": "timer",
+                                                                    "amount": "0.2",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "Up",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        },
+                                                                        {
+                                                                            "part": "volume",
+                                                                            "type": "updatePattern",
+                                                                            "wave": 1,
+                                                                            "volume": "+10",
+                                                                            "channel": 1
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "part": "volume",
+                                                                    "type": "patternState",
+                                                                    "wave": 1,
+                                                                    "value": "100",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "Down",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        }
+                                                                    ],
+                                                                    "channel": 1,
+                                                                    "operator": ">="
+                                                                }
+                                                            ]
+                                                        },
+                                                        "Down": {
+                                                            "actions": [],
+                                                            "triggers": [
+                                                                {
+                                                                    "type": "timer",
+                                                                    "amount": "0.2",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "Down",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        },
+                                                                        {
+                                                                            "part": "volume",
+                                                                            "type": "updatePattern",
+                                                                            "wave": 1,
+                                                                            "volume": "-10",
+                                                                            "channel": 1
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "part": "volume",
+                                                                    "type": "patternState",
+                                                                    "wave": 1,
+                                                                    "value": "0",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "Up",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        }
+                                                                    ],
+                                                                    "channel": 1,
+                                                                    "operator": "<="
+                                                                }
+                                                            ]
+                                                        },
+                                                        "START": {
+                                                            "actions": [
+                                                                {
+                                                                    "job": "1",
+                                                                    "step": "Up",
+                                                                    "type": "updateJob",
+                                                                    "action": "goTo"
+                                                                },
+                                                                {
+                                                                    "part": "volume",
+                                                                    "type": "updatePattern",
+                                                                    "wave": 1,
+                                                                    "volume": "0",
+                                                                    "channel": 1
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "waves": "1",
+                                            "channels": 1,
+                                            "waveCombine": "average",
+                                            "initialActions": [
+                                                {
+                                                    "job": "1",
+                                                    "type": "updateJob",
+                                                    "action": "start"
+                                                }
+                                            ]
+                                        },
+                                        "parentUpdate": null,
+                                        "publishedLatest": null,
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{pattern} == \"increase_then_reverse\""
+                        },
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-b",
+                                    "pattern": {
+                                        "id": "-MUIuRbZ18L2pfu94ARY",
+                                        "name": "Increase Then Drop",
+                                        "tags": [],
+                                        "type": "script",
+                                        "channels": 1,
+                                        "published": null,
+                                        "description": "Ramp up for 2 seconds and then drop to 0.",
+                                        "patternData": {
+                                            "ma": {},
+                                            "jobs": {
+                                                "1": {
+                                                    "steps": {
+                                                        "1": {
+                                                            "actions": [],
+                                                            "triggers": [
+                                                                {
+                                                                    "type": "timer",
+                                                                    "amount": "0.2",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "1",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        },
+                                                                        {
+                                                                            "part": "volume",
+                                                                            "type": "updatePattern",
+                                                                            "wave": 1,
+                                                                            "volume": "+10",
+                                                                            "channel": 1
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "part": "volume",
+                                                                    "type": "patternState",
+                                                                    "wave": 1,
+                                                                    "value": "100",
+                                                                    "actions": [
+                                                                        {
+                                                                            "job": "1",
+                                                                            "step": "START",
+                                                                            "type": "updateJob",
+                                                                            "action": "goTo"
+                                                                        }
+                                                                    ],
+                                                                    "channel": 1,
+                                                                    "operator": ">="
+                                                                }
+                                                            ]
+                                                        },
+                                                        "START": {
+                                                            "actions": [
+                                                                {
+                                                                    "job": "1",
+                                                                    "step": "1",
+                                                                    "type": "updateJob",
+                                                                    "action": "goTo"
+                                                                },
+                                                                {
+                                                                    "part": "volume",
+                                                                    "type": "updatePattern",
+                                                                    "wave": 1,
+                                                                    "volume": "0",
+                                                                    "channel": 1
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "waves": "1",
+                                            "channels": 1,
+                                            "waveCombine": "average",
+                                            "initialActions": [
+                                                {
+                                                    "job": "1",
+                                                    "type": "updateJob",
+                                                    "action": "start"
+                                                }
+                                            ]
+                                        },
+                                        "parentUpdate": null,
+                                        "publishedLatest": null,
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{pattern} == \"increase_then_drop\""
+                        },
+                        {
+                            "type": "timer",
+                            "amount": "1",
+                            "actions": [
+                                {
+                                    "job": "Vibrate",
+                                    "type": "updateJob",
+                                    "action": "stop"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "expressionState",
+                            "actions": [
+                                {
+                                    "type": "updateComponent",
+                                    "action": "setPattern",
+                                    "channel": "generic-1-b",
+                                    "pattern": {
+                                        "name": "Off",
+                                        "channels": 1,
+                                        "description": "Intensity will be at 0 even if slider is active",
+                                        "patternData": {
+                                            "custom": "off"
+                                        },
+                                        "supportedDevices": [
+                                            "generic-1"
+                                        ]
+                                    },
+                                    "patternAction": "specific"
+                                }
+                            ],
+                            "expression": "{pattern} == \"stop\""
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "queues": [],
+    "channels": {
+        "webhook-a": {
+            "type": "webhook"
+        },
+        "generic-1-a": {
+            "name": "Primary Toy",
+            "type": "generic-1"
+        },
+        "generic-1-b": {
+            "name": "Secondary Toy",
+            "type": "generic-1"
+        },
+        "shockcollar-a": {
+            "name": null,
+            "type": "shockcollar"
+        }
+    },
+    "controls": [
+        {
+            "type": "slider",
+            "name": "Shock Collar Maximum",
+            "description": "Control the maximum intensity on your Shock Collar",
+            "id": "shock_max",
+            "up": "Yes",
+            "down": "No",
+            "min": 0,
+            "max": 15,
+            "value": 0
+        },
+        {
+            "type": "slider",
+            "name": "Primary Toy Maximum",
+            "description": "It's best to leave this at 100% and let your mods control it.",
+            "id": "primary_max",
+            "value": "100",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "type": "slider",
+            "name": "Secondary Toy Maximum",
+            "description": "It's best to leave this at 100% and let your mods control it.",
+            "id": "secondary_max",
+            "min": 0,
+            "max": 100,
+            "value": 100
+        }
+    ]
+}
