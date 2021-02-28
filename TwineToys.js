@@ -213,15 +213,29 @@ function TwineToysRequest({ toy, pattern, intensity, duration }) {
   const url = new URL('https://xtoys.app/webhook')
   url.searchParams.append('id', webhook)
   url.searchParams.append('toy', toy)
-  url.searchParams.append('action', duration ? 'pulse' : 'vibrate')
+  url.searchParams.append(
+    'action',
+    pattern ? 'vibrate' : duration ? 'pulse' : 'pattern'
+  )
   url.searchParams.append('intensity', parseInt(intensity, 10))
-  if (duration) url.searchParams.append('duration', parseInt(duration, 10))
-  else if (pattern) url.searchParams.append('pattern', pattern)
+  url.searchParams.append('duration', duration ? parseInt(duration, 10) : 'inf')
+  if (pattern) url.searchParams.append('pattern', pattern)
+  if (dev) console.log(url.href)
+  GM_xmlhttpRequest({ url: url.href, method: 'GET' })
+}
+
+function TwineToysStop({ toy }) {
+  console.log('stopping')
+  const url = new URL('https://xtoys.app/webhook')
+  url.searchParams.append('id', webhook)
+  url.searchParams.append('toy', toy)
+  url.searchParams.append('action', 'stop')
+  if (dev) console.log(url.href)
   GM_xmlhttpRequest({ url: url.href, method: 'GET' })
 }
 
 /**
- * Sends a single shock with a given intensity to the Shock Collaruser has setup, and provides a warning if the user has not opted out of warnings.
+ * Sends a single shock with a given intensity to the Shock Collar user has setup, and provides a warning if the user has not opted out of warnings.
  * @param {Object} shockDetails The settings for the intensity/vibration of the shock.
  * @param {number} shockDetails.intensity The strength of the output, between 1 and 15.
  * @param {boolean} shockDetails.vibrate Optionally vibrate the shock collar right before the shock.
@@ -245,28 +259,16 @@ function TwineToysShock({ intensity, vibrate }) {
   setTimeout(
     () => {
       const url = new URL('https://xtoys.app/webhook')
-      url.searchParams.append('id', 'webhook')
+      url.searchParams.append('id', webhook)
+      url.searchParams.append('action', 'shock')
       url.searchParams.append('intensity', parseInt(intensity, 10))
       url.searchParams.append('vibrate', vibrate ? 'true' : 'false')
       if (shockWarnings) warningModal.remove()
+      if (dev) console.log(url.href)
       GM_xmlhttpRequest({ url: url.href, method: 'GET' })
     },
     shockWarnings ? 5000 : 1
   )
-}
-
-/**
- * Resolves the path of an object (given as an array) to that object to find the value at that path. Helpful for finding the value of a changed path on the twine state.
- * @param {object} The object (presumably a twine state) we are deriving the path of.
- * @param {array} path The path of the variable in the object we are seeking, as an array. eg: obj.playerValues.health -> ['playerValues', 'health']
- */
-function TwineToysResolvePath(obj, path) {
-  let current = obj
-  while (path.length) {
-    if (typeof current !== 'object') return undefined
-    current = current[path.shift()]
-  }
-  return current
 }
 
 /**
@@ -290,31 +292,14 @@ function TwineToysGetTracker(uniqueId) {
  * a given comparator's condition is met.
  */
 class TwineToysTracker {
-  /**
-   * Create a tracker.
-   * @param {Object} details The path, comparison function, and action function which this tracker applies.
-   * @param {string} [details.uniqueId] The optional ID of this listener to reference with TwineToysGetTracker(uniqueId)
-   * @param {array} details.path The path in the twine state we're focusing on changes for. eg: state.player.variables.hunger[0] -> ['state', 'player', 'variables', 'hunger', 0]
-   * @param {function} details.comparatorFunction A function which returns true or false, and is passed the arguments { index, variableChanged, oldValue } to decide whether or not the tracker should apply its action function based on how the variable at the given path has changed.
-   * @param {function} details.actionFunction A function which determines what the script should do when the path has changed and the comparatorFunction returns true. It is also passed { index, variableChanged, oldValue }.
-   * @param {Object} [details.applyAction] An optional object to specify when the actionFunction should be applied, leave null for immediately.
-   * @param {string} [details.applyAction.jQEvent] An optional jQuery event which will fire the actionFunction when the event is fired (after waiting applyAction.time).
-   * @param {number} [details.applyAction.time] An optional amount of time to wait once the jQuery event occurs before firing the actionFunction.
-   * @param {Objet} [details.selector] An optional object to specify an HTML element that should be interacted with for the action to fire.
-   * @param {string} [details.selector.name] The jQuery selector, eg: '.className' to be searched for.
-   * @param {boolean} [details.selector.highlight] Derermines whether or not the element should be visually highlighted as something to be interacted with.
-   * @param {customCSS} [details.selector.customCSS] Overwrite the default TwineToys CSS for elements which are interacted with.
-   */
   constructor({
     uniqueId,
-    path,
     comparatorFunction,
     actionFunction,
     applyAction,
     selector,
   }) {
     this.uniqueId = uniqueId
-    this.path = path
     this.comparatorFunction = comparatorFunction
     this.actionFunction = actionFunction
     this.applyAction = applyAction
@@ -338,29 +323,11 @@ class TwineToysTracker {
   getTracking() {
     return this.tracking
   }
-  /**
-   *
-   * @param {Object} state The object passed by TamperTwine when the twine state changes, which contains information about the changed variables and old state.
-   * @param {number} state.index The Twine history index of the current change.applyAction
-   * @param {Object} state.changes The changed (updated, deleted, added) variables between the change and the old twine state.
-   * @param {Object} state.oldState The old twine state at the previous index.
-   */
-  runCheck({ index, changes, oldState }) {
-    // If a variable has changed which matches the path of the given variable
-    const variableChanged = changes.find(
-      (change) => JSON.stringify(change.path) === JSON.stringify(this.path)
-    )
-    if (!variableChanged) return
-    // Perform the user's check function
-    const newObject = {
-      index,
-      variableChanged,
-      oldValue: TwineToysResolvePath(oldState, variableChanged.path),
-    }
+  runCheck(details) {
+    console.log(details, this.comparatorFunction(details))
     if (
-      this.comparatorFunction(newObject) && this.selector
-        ? $(this.selector).length > 0
-        : true
+      this.comparatorFunction(details) &&
+      (this.selector ? $(this.selector).length > 0 : true)
     ) {
       // Perform the user's action function
       // If we're looking for a slector to exist
@@ -384,21 +351,18 @@ class TwineToysTracker {
           element.on(this.applyAction?.jQEvent, () => {
             if (this.applyAction.time)
               setTimeout(
-                () => this.actionFunction(newObject),
+                () => this.actionFunction(details),
                 this.applyAction.time
               )
-            else this.actionFunction(newObject)
+            else this.actionFunction(details)
             element.off(this.applyAction?.jQEvent)
           })
         }
       } else {
         // If we're just checking the comparator, and don't care about selectors.
         if (this.applyAction?.time)
-          setTimeout(
-            () => this.actionFunction(newObject),
-            this.applyAction.time
-          )
-        else this.actionFunction(newObject)
+          setTimeout(() => this.actionFunction(details), this.applyAction.time)
+        else this.actionFunction(details)
       }
     }
   }
